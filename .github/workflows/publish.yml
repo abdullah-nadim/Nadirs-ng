@@ -1,0 +1,33 @@
+name: Publish npm package
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@abdullah-nadim'
+
+      - name: Install
+        run: npm install
+
+      - name: Build library
+        run: npx ng build Nadirs --configuration production
+
+      - name: Publish
+        run: npm publish ./dist/nadirs
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
